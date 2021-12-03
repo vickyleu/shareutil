@@ -2,12 +2,11 @@ package me.shaohui.shareutil;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.openapi.IWBAPI;
 import com.sina.weibo.sdk.openapi.WBAPIFactory;
@@ -60,7 +59,7 @@ public class ShareUtil {
     private static String mUrlPath;
 
 
-    static void action(AppCompatActivity activity) {
+    static void action(Activity activity) {
         mShareInstance = getShareInstance(mPlatform, activity);
 
         // 防止之后调用 NullPointException

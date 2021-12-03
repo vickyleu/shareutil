@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
-
 import com.tencent.connect.UnionInfo;
 import com.tencent.connect.common.Constants;
 import com.tencent.tauth.IUiListener;
@@ -57,9 +55,9 @@ public class QQLoginInstance extends LoginInstance {
 
     private LoginListener mLoginListener;
 
-    private AppCompatActivity mActivity;
+    private Activity mActivity;
 
-    public QQLoginInstance(final AppCompatActivity activity, final LoginListener listener,
+    public QQLoginInstance(final Activity activity, final LoginListener listener,
                            final boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mActivity = activity;

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 
 import com.tencent.connect.share.QQShare;
@@ -58,8 +57,8 @@ public class QQShareInstance implements ShareInstance {
 
     @Override
     public void shareMedia(final int platform, final String title, final String targetUrl,
-            final String summary, final ShareImageObject shareImageObject, final Activity activity,
-            final ShareListener listener) {
+                           final String summary, final ShareImageObject shareImageObject, final Activity activity,
+                           final ShareListener listener) {
         Flowable.create(new FlowableOnSubscribe<String>() {
             @Override
             public void subscribe(FlowableEmitter<String> emitter) throws Exception {
@@ -99,7 +98,7 @@ public class QQShareInstance implements ShareInstance {
 
     @Override
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
-            final Activity activity, final ShareListener listener) {
+                           final Activity activity, final ShareListener listener) {
         Flowable.create(new FlowableOnSubscribe<String>() {
             @Override
             public void subscribe(FlowableEmitter<String> emitter) throws Exception {
@@ -171,7 +170,7 @@ public class QQShareInstance implements ShareInstance {
     }
 
     private void shareToQQForMedia(String title, String summary, String targetUrl, String thumbUrl,
-                                   AppCompatActivity activity, ShareListener listener) {
+                                   Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         params.putString(QQShare.SHARE_TO_QQ_TITLE, title);
@@ -181,14 +180,14 @@ public class QQShareInstance implements ShareInstance {
         mTencent.shareToQQ(activity, params, listener);
     }
 
-    private void shareToQQForImage(String localUrl, AppCompatActivity activity, ShareListener listener) {
+    private void shareToQQForImage(String localUrl, Activity activity, ShareListener listener) {
         Bundle params = new Bundle();
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, localUrl);
         mTencent.shareToQQ(activity, params, listener);
     }
 
-    private void shareToQZoneForText(String text, AppCompatActivity activity, ShareListener listener) {
+    private void shareToQZoneForText(String text, Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
         params.putInt(QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
                 QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD);
@@ -197,7 +196,7 @@ public class QQShareInstance implements ShareInstance {
     }
 
     private void shareToQZoneForMedia(String title, String targetUrl, String summary,
-                                      String imageUrl, AppCompatActivity activity, ShareListener listener) {
+                                      String imageUrl, Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
         final ArrayList<String> image = new ArrayList<>();
         image.add(imageUrl);
@@ -210,7 +209,7 @@ public class QQShareInstance implements ShareInstance {
         mTencent.shareToQzone(activity, params, listener);
     }
 
-    private void shareToQzoneForImage(String imagePath, AppCompatActivity activity, ShareListener listener) {
+    private void shareToQzoneForImage(String imagePath, Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
         final ArrayList<String> image = new ArrayList<>();
         image.add(imagePath);

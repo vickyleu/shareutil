@@ -2,10 +2,9 @@ package me.shaohui.shareutil;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
@@ -44,7 +43,7 @@ public class LoginUtil {
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 
-    static void action(AppCompatActivity activity) {
+    static void action(Activity activity) {
         if (mLoginListener != null) {
             switch (mPlatform) {
                 case LoginPlatform.QQ:

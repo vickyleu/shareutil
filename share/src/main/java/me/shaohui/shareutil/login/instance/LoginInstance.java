@@ -3,7 +3,6 @@ package me.shaohui.shareutil.login.instance;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
 
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.result.BaseToken;
@@ -14,7 +13,7 @@ import me.shaohui.shareutil.login.result.BaseToken;
 
 public abstract class LoginInstance {
 
-    public LoginInstance(AppCompatActivity activity, LoginListener listener, boolean fetchUserInfo) {
+    public LoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
 
     }
 

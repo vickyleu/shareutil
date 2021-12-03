@@ -2,18 +2,18 @@ package me.shaohui.shareutil;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by shaohui on 2016/11/19.
  */
 
-public class _ShareActivity extends AppCompatActivity {
+public class _ShareActivity extends Activity {
 
     private int mType;
 

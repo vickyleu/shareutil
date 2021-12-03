@@ -5,8 +5,6 @@ import static me.shaohui.shareutil.ShareLogger.INFO;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
@@ -56,7 +54,7 @@ public class WxLoginInstance extends LoginInstance {
 
     private boolean fetchUserInfo;
 
-    public WxLoginInstance(AppCompatActivity activity, LoginListener listener, boolean fetchUserInfo) {
+    public WxLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mLoginListener = listener;
         mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());

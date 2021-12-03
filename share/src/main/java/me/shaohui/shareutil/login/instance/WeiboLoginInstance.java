@@ -7,9 +7,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.handler.SinaSsoHandler;
@@ -48,7 +45,7 @@ public class WeiboLoginInstance extends LoginInstance {
 
     private LoginListener mLoginListener;
 
-    public WeiboLoginInstance(AppCompatActivity activity, LoginListener listener, boolean fetchUserInfo) {
+    public WeiboLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
 //        AuthInfo authInfo = new AuthInfo(activity, ShareManager.CONFIG.getWeiboId(),
 //                ShareManager.CONFIG.getWeiboRedirectUrl(), ShareManager.CONFIG.getWeiboScope());
