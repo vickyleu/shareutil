@@ -2,6 +2,7 @@ package me.shaohui.shareutil.share.instance;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -55,44 +56,31 @@ public class QQShareInstance implements ShareInstance {
         }
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareMedia(final int platform, final String title, final String targetUrl,
                            final String summary, final ShareImageObject shareImageObject, final Activity activity,
                            final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<String>() {
-            @Override
-            public void subscribe(FlowableEmitter<String> emitter) throws Exception {
-                try {
-                    emitter.onNext(ImageDecoder.decode(activity, shareImageObject));
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<String>) emitter -> {
+            try {
+                emitter.onNext(ImageDecoder.decode(activity, shareImageObject));
+            } catch (Exception e) {
+                emitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Consumer<Subscription>() {
-                    @Override
-                    public void accept(Subscription subscription) throws Exception {
-                        listener.shareRequest();
+                .doOnSubscribe(subscription -> listener.shareRequest())
+                .subscribe(s -> {
+                    if (platform == SharePlatform.QZONE) {
+                        shareToQZoneForMedia(title, targetUrl, summary, s, activity,
+                                listener);
+                    } else {
+                        shareToQQForMedia(title, summary, targetUrl, s, activity, listener);
                     }
-                })
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        if (platform == SharePlatform.QZONE) {
-                            shareToQZoneForMedia(title, targetUrl, summary, s, activity,
-                                    listener);
-                        } else {
-                            shareToQQForMedia(title, summary, targetUrl, s, activity, listener);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        activity.finish();
-                        listener.shareFailure(new Exception(throwable));
-                    }
+                }, throwable -> {
+                    activity.finish();
+                    listener.shareFailure(new Exception(throwable));
                 });
     }
 

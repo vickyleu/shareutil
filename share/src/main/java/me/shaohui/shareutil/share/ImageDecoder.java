@@ -28,7 +28,7 @@ import static me.shaohui.shareutil.ShareLogger.INFO;
 
 public class ImageDecoder {
 
-    private static final String FILE_NAME = "share_image.jpg";
+    private static final String FILE_NAME = "/shareData/test.png";
 
     public static String decode(Context context, ShareImageObject imageObject) throws Exception {
         File resultFile = cacheFile(context);
@@ -83,7 +83,7 @@ public class ImageDecoder {
     private static File cacheFile(Context context) throws Exception {
         String state = Environment.getExternalStorageState();
         if (state != null && state.equals(Environment.MEDIA_MOUNTED)) {
-            return new File(context.getExternalFilesDir(""), FILE_NAME);
+            return new File(context.getExternalFilesDir(null), FILE_NAME);
         } else {
             throw new Exception(INFO.SD_CARD_NOT_AVAILABLE);
         }
