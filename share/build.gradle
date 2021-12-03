@@ -40,12 +40,11 @@ dependencies {
     api 'androidx.annotation:annotation:1.3.0'
     api 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:6.7.9'//微信官方依赖库，必选
     api 'com.umeng.umsdk:share-sina:7.1.7'//新浪微博完整版
-//    implementation 'com.sina.weibo.sdk:core:10.10.0:openDefaultRelease@aar'
-    implementation(name: 'openDefault-10.10.0', ext: 'aar')
+//    implementation(name: 'openDefault-10.10.0', ext: 'aar')
+    implementation 'io.github.good-good-study:sina-weibo-sdk:10.10.1'
     api 'com.tencent.tauth:qqopensdk:3.53.0'//QQ官方依赖库，必选
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.3.1'//QQ SDK在3.53.0版本及以上时需要集成okhttp官方依赖库，必选
-
 
 //    api  'com.umeng.umsdk:common:9.4.4'// (必选)
 //    api  'com.umeng.umsdk:asms:1.4.1'// asms包依赖必选
@@ -63,12 +62,6 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.github.vickyleu'
-                artifactId = 'share'
-                version = '1.0.5'
-            }
-            debug(MavenPublication) {
-                from components.debug
                 groupId = 'com.github.vickyleu'
                 artifactId = 'share'
                 version = '1.0.5'
