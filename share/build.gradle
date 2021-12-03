@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 group = 'com.github.vickyleu'
-version = '1.0.5'
+version = '1.0.0@aar'
 
 android {
     compileSdkVersion 30
@@ -13,7 +13,7 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0.5"
+        versionName "1.0.0"
         manifestPlaceholders = [
                 qq_id: ""
         ]
@@ -64,7 +64,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.vickyleu'
                 artifactId = 'share'
-                version = '1.0.5'
+                version = '1.0.0@aar'
             }
         }
     }
