@@ -84,42 +84,29 @@ public class QQShareInstance implements ShareInstance {
                 });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
                            final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<String>() {
-            @Override
-            public void subscribe(FlowableEmitter<String> emitter) throws Exception {
-                try {
-                    emitter.onNext(ImageDecoder.decode(activity, shareImageObject));
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<String>) emitter -> {
+            try {
+                emitter.onNext(ImageDecoder.decode(activity, shareImageObject));
+            } catch (Exception e) {
+                emitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Consumer<Subscription>() {
-                    @Override
-                    public void accept(Subscription subscription) throws Exception {
-                        listener.shareRequest();
+                .doOnSubscribe(subscription -> listener.shareRequest())
+                .subscribe(localPath -> {
+                    if (platform == SharePlatform.QZONE) {
+                        shareToQzoneForImage(localPath, activity, listener);
+                    } else {
+                        shareToQQForImage(localPath, activity, listener);
                     }
-                })
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String localPath) throws Exception {
-                        if (platform == SharePlatform.QZONE) {
-                            shareToQzoneForImage(localPath, activity, listener);
-                        } else {
-                            shareToQQForImage(localPath, activity, listener);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        activity.finish();
-                        listener.shareFailure(new Exception(throwable));
-                    }
+                }, throwable -> {
+                    activity.finish();
+                    listener.shareFailure(new Exception(throwable));
                 });
     }
 

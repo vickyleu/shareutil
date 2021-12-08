@@ -1,8 +1,10 @@
 package me.shaohui.shareutil.share;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import java.io.ByteArrayOutputStream;
@@ -17,10 +19,13 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.Util;
 import okio.BufferedSink;
 import okio.Okio;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
+
+import androidx.core.content.FileProvider;
 
 /**
  * Created by shaohui on 2016/11/19.
@@ -58,7 +63,7 @@ public class ImageDecoder {
 
         if (new File(pathOrUrl).exists()) {
             // copy file
-            return decodeFile(new File(pathOrUrl), resultFile);
+            return decodeFile(context,new File(pathOrUrl), resultFile);
         } else if (HttpUrl.parse(pathOrUrl) != null) {
             // download image
             return downloadImageToUri(pathOrUrl, resultFile);
@@ -101,9 +106,16 @@ public class ImageDecoder {
         outputStream.close();
     }
 
-    private static String decodeFile(File origin, File result) throws IOException {
+    private static String decodeFile(Context context, File origin, File result) throws IOException {
         copyFile(new FileInputStream(origin), new FileOutputStream(result, false));
-        return result.getAbsolutePath();
+        Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".fileprovider",  // 要与`AndroidManifest.xml`里配置的`authorities`一致，假设你的应用包名为com.example.app
+                result);
+        // 授权给微信访问路径
+        context.grantUriPermission("com.tencent.mm",  // 这里填微信包名
+                contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        return contentUri.toString();
+//        return result.getAbsolutePath();
     }
 
     public static byte[] compress2Byte(String imagePath, int size, int length) {
