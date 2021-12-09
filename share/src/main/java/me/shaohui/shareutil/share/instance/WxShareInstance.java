@@ -1,13 +1,11 @@
 package me.shaohui.shareutil.share.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.Pair;
 
 import com.tencent.mm.opensdk.modelbase.BaseReq;
@@ -78,7 +76,7 @@ public class WxShareInstance implements ShareInstance {
             @Override
             public void subscribe(FlowableEmitter<byte[]> emitter) throws Exception {
                 try {
-                    String imagePath = ImageDecoder.decode(activity, shareImageObject);
+                    String imagePath = ImageDecoder.decode(activity, shareImageObject, platform);
                     emitter.onNext(ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE));
                 } catch (Exception e) {
                     emitter.onError(e);
@@ -115,91 +113,65 @@ public class WxShareInstance implements ShareInstance {
                 });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
                            final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<Pair<Bitmap, byte[]>>() {
-            @Override
-            public void subscribe(FlowableEmitter<Pair<Bitmap, byte[]>> emitter) throws Exception {
-                try {
-                    String imagePath = ImageDecoder.decode(activity, shareImageObject);
-                    emitter.onNext(Pair.create(BitmapFactory.decodeFile(imagePath),
-                            ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE)));
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<Pair<Bitmap, byte[]>>) emitter -> {
+            try {
+                String imagePath = ImageDecoder.decode(activity, shareImageObject, platform);
+                emitter.onNext(Pair.create(BitmapFactory.decodeFile(imagePath),
+                        ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE)));
+            } catch (Exception e) {
+                emitter.onError(e);
             }
         }, BackpressureStrategy.BUFFER)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Consumer<Subscription>() {
-                    @Override
-                    public void accept(Subscription subscription) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
-                .subscribe(new Consumer<Pair<Bitmap, byte[]>>() {
-                    @Override
-                    public void accept(Pair<Bitmap, byte[]> pair) throws Exception {
-                        WXImageObject imageObject = new WXImageObject(pair.first);
+                .doOnSubscribe(subscription -> listener.shareRequest())
+                .subscribe(pair -> {
+                    WXImageObject imageObject = new WXImageObject(pair.first);
 
-                        WXMediaMessage message = new WXMediaMessage();
-                        message.mediaObject = imageObject;
-                        message.thumbData = pair.second;
+                    WXMediaMessage message = new WXMediaMessage();
+                    message.mediaObject = imageObject;
+                    message.thumbData = pair.second;
 
-                        sendMessage(platform, message, buildTransaction("image"));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        activity.finish();
-                        listener.shareFailure(new Exception(throwable));
-                    }
+                    sendMessage(platform, message, buildTransaction("image"));
+                }, throwable -> {
+                    activity.finish();
+                    listener.shareFailure(new Exception(throwable));
                 });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareMiniProgram(final int platform, final String webpageUrl, final String originId, final String urlPath, final
     String title, final String description, final ShareImageObject thumbData, final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<byte[]>() {
-            @Override
-            public void subscribe(FlowableEmitter<byte[]> emitter) throws Exception {
-                try {
-                    byte[] thumbDataByte = ImageDecoder.bitmap2Bytes(thumbData.getBitmap(), Bitmap.CompressFormat.PNG);
-                    emitter.onNext(thumbDataByte);
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<byte[]>) emitter -> {
+            try {
+                byte[] thumbDataByte = ImageDecoder.bitmap2Bytes(thumbData.getBitmap(), Bitmap.CompressFormat.PNG);
+                emitter.onNext(thumbDataByte);
+            } catch (Exception e) {
+                emitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Consumer<Subscription>() {
-                    @Override
-                    public void accept(Subscription subscription) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
-                .subscribe(new Consumer<byte[]>() {
-                    @Override
-                    public void accept(byte[] bytes) throws Exception {
-                        WXMiniProgramObject miniProgram = new WXMiniProgramObject();
-                        miniProgram.webpageUrl = webpageUrl;//兼容低版本url
-                        miniProgram.userName = originId;//小程序端提供参数   ！
-                        miniProgram.path = urlPath;//小程序端提供参数                      !
-                        WXMediaMessage mediaMessage = new WXMediaMessage(miniProgram);
-                        mediaMessage.title = title;//自定义
-                        mediaMessage.description = description;//自定义
-                        mediaMessage.thumbData = bytes;
+                .doOnSubscribe(subscription -> listener.shareRequest())
+                .subscribe(bytes -> {
+                    WXMiniProgramObject miniProgram = new WXMiniProgramObject();
+                    miniProgram.webpageUrl = webpageUrl;//兼容低版本url
+                    miniProgram.userName = originId;//小程序端提供参数   ！
+                    miniProgram.path = urlPath;//小程序端提供参数                      !
+                    WXMediaMessage mediaMessage = new WXMediaMessage(miniProgram);
+                    mediaMessage.title = title;//自定义
+                    mediaMessage.description = description;//自定义
+                    mediaMessage.thumbData = bytes;
 
-                        sendMessage(platform, mediaMessage, buildTransaction("miniProgram"));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        activity.finish();
-                        listener.shareFailure(new Exception(throwable));
-                    }
+                    sendMessage(platform, mediaMessage, buildTransaction("miniProgram"));
+                }, throwable -> {
+                    activity.finish();
+                    listener.shareFailure(new Exception(throwable));
                 });
     }
 

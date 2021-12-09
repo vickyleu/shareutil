@@ -244,7 +244,7 @@ public class ShareUtil {
 
     @Deprecated
     public static boolean isQQInstalled(@NonNull Context context) {
-        Tencent api = Tencent.createInstance(ShareManager.CONFIG.getQqId(), context);
+        Tencent api = Tencent.createInstance(ShareManager.CONFIG.getQqId(), context,"com.tencent.sample.fileprovider");
         return api.isQQInstalled(context);
     }
 

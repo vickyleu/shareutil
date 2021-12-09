@@ -16,17 +16,13 @@ import com.tencent.connect.share.QzonePublish;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.Tencent;
 
-import org.reactivestreams.Subscription;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
@@ -43,7 +39,7 @@ public class QQShareInstance implements ShareInstance {
     private Tencent mTencent;
 
     public QQShareInstance(Context context, String app_id) {
-        mTencent = Tencent.createInstance(app_id, context.getApplicationContext());
+        mTencent = Tencent.createInstance(app_id, context.getApplicationContext(),"com.tencent.sample.fileprovider");
     }
 
     @Override
@@ -63,7 +59,7 @@ public class QQShareInstance implements ShareInstance {
                            final ShareListener listener) {
         Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             try {
-                emitter.onNext(ImageDecoder.decode(activity, shareImageObject));
+                emitter.onNext(ImageDecoder.decode(activity, shareImageObject, platform));
             } catch (Exception e) {
                 emitter.onError(e);
             }
@@ -90,7 +86,7 @@ public class QQShareInstance implements ShareInstance {
                            final Activity activity, final ShareListener listener) {
         Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             try {
-                emitter.onNext(ImageDecoder.decode(activity, shareImageObject));
+                emitter.onNext(ImageDecoder.decode(activity, shareImageObject, platform));
             } catch (Exception e) {
                 emitter.onError(e);
             }

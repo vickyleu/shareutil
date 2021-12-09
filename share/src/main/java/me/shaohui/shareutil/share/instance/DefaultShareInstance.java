@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.share.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -49,44 +50,29 @@ public class DefaultShareInstance implements ShareInstance {
                 activity.getResources().getString(R.string.vista_share_title)));
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareImage(int platform, final ShareImageObject shareImageObject,
             final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<Uri>() {
-            @Override
-            public void subscribe(FlowableEmitter<Uri> emitter) throws Exception {
-                try {
-                    Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject)));
-                    emitter.onNext(uri);
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
+            try {
+                Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject,platform)));
+                emitter.onNext(uri);
+            } catch (Exception e) {
+                emitter.onError(e);
             }
         }, BackpressureStrategy.BUFFER )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Consumer<Subscription>() {
-                    @Override
-                    public void accept(Subscription subscription) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
-                .subscribe(new Consumer<Uri>() {
-                    @Override
-                    public void accept(Uri uri) throws Exception {
-                        Intent shareIntent = new Intent();
-                        shareIntent.setAction(Intent.ACTION_SEND);
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                        shareIntent.setType("image/jpeg");
-                        activity.startActivity(Intent.createChooser(shareIntent,
-                                activity.getResources().getText(R.string.vista_share_title)));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        listener.shareFailure(new Exception(throwable));
-                    }
-                });
+                .doOnSubscribe(subscription -> listener.shareRequest())
+                .subscribe(uri -> {
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.setType("image/jpeg");
+                    activity.startActivity(Intent.createChooser(shareIntent,
+                            activity.getResources().getText(R.string.vista_share_title)));
+                }, throwable -> listener.shareFailure(new Exception(throwable)));
 
     }
 

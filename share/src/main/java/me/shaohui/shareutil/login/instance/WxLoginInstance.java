@@ -2,6 +2,7 @@ package me.shaohui.shareutil.login.instance;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -70,72 +71,50 @@ public class WxLoginInstance extends LoginInstance {
         mIWXAPI.sendReq(req);
     }
 
+    @SuppressLint("CheckResult")
     private void getToken(final String code) {
-        Flowable.create(new FlowableOnSubscribe<WxToken>() {
-            @Override
-            public void subscribe(FlowableEmitter<WxToken> wxTokenEmitter) throws Exception {
-                Request request = new Request.Builder().url(buildTokenUrl(code)).build();
-                try {
-                    Response response = mClient.newCall(request).execute();
-                    JSONObject jsonObject = new JSONObject(response.body().string());
-                    WxToken token = WxToken.parse(jsonObject);
-                    wxTokenEmitter.onNext(token);
-                } catch (IOException | JSONException e) {
-                    wxTokenEmitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<WxToken>) wxTokenEmitter -> {
+            Request request = new Request.Builder().url(buildTokenUrl(code)).build();
+            try {
+                Response response = mClient.newCall(request).execute();
+                JSONObject jsonObject = new JSONObject(response.body().string());
+                WxToken token = WxToken.parse(jsonObject);
+                wxTokenEmitter.onNext(token);
+            } catch (IOException | JSONException e) {
+                wxTokenEmitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<WxToken>() {
-                    @Override
-                    public void accept(WxToken wxToken) throws Exception {
-                        if (fetchUserInfo) {
-                            mLoginListener.beforeFetchUserInfo(wxToken);
-                            fetchUserInfo(wxToken);
-                        } else {
-                            mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
-                        }
+                .subscribe(wxToken -> {
+                    if (fetchUserInfo) {
+                        mLoginListener.beforeFetchUserInfo(wxToken);
+                        fetchUserInfo(wxToken);
+                    } else {
+                        mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable.getMessage()));
-                    }
-                });
+                }, throwable -> mLoginListener.loginFailure(new Exception(throwable.getMessage())));
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
-        Flowable.create(new FlowableOnSubscribe<WxUser>() {
-            @Override
-            public void subscribe(FlowableEmitter<WxUser> wxUserEmitter) throws Exception {
-                Request request = new Request.Builder().url(buildUserInfoUrl(token)).build();
-                try {
-                    Response response = mClient.newCall(request).execute();
-                    JSONObject jsonObject = new JSONObject(response.body().string());
-                    WxUser user = WxUser.parse(jsonObject);
-                    token.setUnionid(user.getUnionid());
-                    wxUserEmitter.onNext(user);
-                } catch (IOException | JSONException e) {
-                    wxUserEmitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<WxUser>) wxUserEmitter -> {
+            Request request = new Request.Builder().url(buildUserInfoUrl(token)).build();
+            try {
+                Response response = mClient.newCall(request).execute();
+                JSONObject jsonObject = new JSONObject(response.body().string());
+                WxUser user = WxUser.parse(jsonObject);
+                token.setUnionid(user.getUnionid());
+                wxUserEmitter.onNext(user);
+            } catch (IOException | JSONException e) {
+                wxUserEmitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<WxUser>() {
-                    @Override
-                    public void accept(WxUser wxUser) throws Exception {
-                        mLoginListener.loginSuccess(
-                                new LoginResult(LoginPlatform.WX, token, wxUser));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable));
-                    }
-                });
+                .subscribe(wxUser -> mLoginListener.loginSuccess(
+                        new LoginResult(LoginPlatform.WX, token, wxUser)), throwable -> mLoginListener.loginFailure(new Exception(throwable)));
     }
 
     @Override

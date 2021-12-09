@@ -6,12 +6,20 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
+    <queries>
+        <package android:name="com.tencent.mm" />
+        <package android:name="com.tencent.mobileqq" />
+        <package android:name="com.tencent.tim" />
+        <package android:name="com.sina.weibo" />
+        <package android:name="com.weico.international" />
+    </queries>
+
     <application
             android:allowBackup="true"
             android:supportsRtl="true"
             >
         <activity
-                android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
+                android:name="com.sina.weibo.sdk.web.WebActivity"
                 android:configChanges="keyboardHidden|orientation"
                 android:exported="false"
                 android:windowSoftInputMode="adjustResize"
