@@ -62,7 +62,7 @@ public class ImageDecoder {
                     }
                 }
                 else if(platform== SharePlatform.QQ||platform== SharePlatform.QZONE){
-                    Uri contentUri = FileProvider.getUriForFile(context,"com.tencent.sample.shareprovider",resultFile);
+                    Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",resultFile);
                     // 授权给微信访问路径
                     context.grantUriPermission("com.tencent.mobileqq", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     context.grantUriPermission("com.tencent.tim", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -172,7 +172,7 @@ public class ImageDecoder {
                     return result.getAbsolutePath();
                 }
             }else if(platform== SharePlatform.QQ||platform== SharePlatform.QZONE){
-                Uri contentUri = FileProvider.getUriForFile(context,"com.tencent.sample.shareprovider",result);
+                Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",result);
                 // 授权给微信访问路径
                 context.grantUriPermission("com.tencent.mobileqq", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.grantUriPermission("com.tencent.tim", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);

@@ -39,7 +39,7 @@ public class QQShareInstance implements ShareInstance {
     private Tencent mTencent;
 
     public QQShareInstance(Context context, String app_id) {
-        mTencent = Tencent.createInstance(app_id, context.getApplicationContext(),"com.tencent.sample.shareprovider");
+        mTencent = Tencent.createInstance(app_id, context.getApplicationContext(),context.getPackageName() + ".shareprovider");
     }
 
     @Override

@@ -61,7 +61,7 @@ public class QQLoginInstance extends LoginInstance {
                            final boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mActivity = activity;
-        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity,"com.tencent.sample.shareprovider");
+        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity,activity.getPackageName() + ".shareprovider");
         mLoginListener = listener;
         mIUiListener = new IUiListener() {
             @Override
