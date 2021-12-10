@@ -114,7 +114,7 @@ public class ImageDecoder {
             if(platform== SharePlatform.WX||platform== SharePlatform.WX_TIMELINE||platform== SharePlatform.WX_MiniProgram){///微信
                 IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
                 if(api.getWXAppSupportAPI() >= 0x27000D00){
-                    Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".fileprovider",result);
+                    Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",result);
                     // 授权给微信访问路径
                     context.grantUriPermission("com.tencent.mm", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     return contentUri.toString();
@@ -122,13 +122,13 @@ public class ImageDecoder {
                     return result.getAbsolutePath();
                 }
             }else if(platform== SharePlatform.QQ||platform== SharePlatform.QZONE){
-                Uri contentUri = FileProvider.getUriForFile(context,"com.tencent.sample.fileprovider",result);
+                Uri contentUri = FileProvider.getUriForFile(context,"com.tencent.sample.shareprovider",result);
                 // 授权给微信访问路径
                 context.grantUriPermission("com.tencent.mobileqq", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.grantUriPermission("com.tencent.tim", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 return contentUri.toString();
             }else if(platform== SharePlatform.WEIBO){
-                Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".fileprovider",result);
+                Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",result);
                 // 授权给微信访问路径
                 context.grantUriPermission("com.sina.weibo", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.grantUriPermission("com.weico.international", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
