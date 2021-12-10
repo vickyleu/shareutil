@@ -59,19 +59,22 @@ public class ImageDecoder {
                     }else{
                         return resultFile.getAbsolutePath();
                     }
-                }else if(platform== SharePlatform.QQ||platform== SharePlatform.QZONE){
+                }
+                else if(platform== SharePlatform.QQ||platform== SharePlatform.QZONE){
                     Uri contentUri = FileProvider.getUriForFile(context,"com.tencent.sample.shareprovider",resultFile);
                     // 授权给微信访问路径
                     context.grantUriPermission("com.tencent.mobileqq", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     context.grantUriPermission("com.tencent.tim", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     return contentUri.toString();
-                }else if(platform== SharePlatform.WEIBO){
+                }
+                else if(platform== SharePlatform.WEIBO){
                     Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",resultFile);
                     // 授权给微信访问路径
                     context.grantUriPermission("com.sina.weibo", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     context.grantUriPermission("com.weico.international", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     return contentUri.toString();
-                }else{
+                }
+                else{
                     return resultFile.getAbsolutePath();
                 }
             }else{
