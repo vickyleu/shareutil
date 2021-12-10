@@ -58,7 +58,7 @@ public class WxLoginInstance extends LoginInstance {
     public WxLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mLoginListener = listener;
-        mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());
+        mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId(),true);
         mClient = new OkHttpClient();
         this.fetchUserInfo = fetchUserInfo;
     }

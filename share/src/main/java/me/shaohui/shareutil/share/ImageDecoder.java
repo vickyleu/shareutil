@@ -48,7 +48,35 @@ public class ImageDecoder {
             FileOutputStream outputStream = new FileOutputStream(resultFile);
             imageObject.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.close();
-            return resultFile.getAbsolutePath();
+            if(checkAndroidNotBelowN()){
+                if(platform== SharePlatform.WX||platform== SharePlatform.WX_TIMELINE||platform== SharePlatform.WX_MiniProgram){///微信
+                    IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
+                    if(api.getWXAppSupportAPI() >= 0x27000D00){
+                        Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",resultFile);
+                        // 授权给微信访问路径
+                        context.grantUriPermission("com.tencent.mm", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        return contentUri.toString();
+                    }else{
+                        return resultFile.getAbsolutePath();
+                    }
+                }else if(platform== SharePlatform.QQ||platform== SharePlatform.QZONE){
+                    Uri contentUri = FileProvider.getUriForFile(context,"com.tencent.sample.shareprovider",resultFile);
+                    // 授权给微信访问路径
+                    context.grantUriPermission("com.tencent.mobileqq", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    context.grantUriPermission("com.tencent.tim", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    return contentUri.toString();
+                }else if(platform== SharePlatform.WEIBO){
+                    Uri contentUri = FileProvider.getUriForFile(context,context.getPackageName() + ".shareprovider",resultFile);
+                    // 授权给微信访问路径
+                    context.grantUriPermission("com.sina.weibo", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    context.grantUriPermission("com.weico.international", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    return contentUri.toString();
+                }else{
+                    return resultFile.getAbsolutePath();
+                }
+            }else{
+                return resultFile.getAbsolutePath();
+            }
         } else {
             throw new IllegalArgumentException();
         }
