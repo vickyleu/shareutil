@@ -45,6 +45,10 @@ public class ImageDecoder {
             return decode(context, imageObject.getPathOrUrl(),platform);
         } else if (imageObject.getBitmap() != null) {
             // save bitmap to file
+            if(resultFile.exists()){
+                resultFile.delete();
+            }
+            resultFile.createNewFile();
             FileOutputStream outputStream = new FileOutputStream(resultFile);
             imageObject.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.close();
@@ -95,9 +99,17 @@ public class ImageDecoder {
     private static String decode(Context context, String pathOrUrl,int platform) throws Exception {
         File resultFile = cacheFile(context);
         if (new File(pathOrUrl).exists()) {
+            if(resultFile.exists()){
+                resultFile.delete();
+            }
+            resultFile.createNewFile();
             // copy file
             return decodeFile(context,new File(pathOrUrl), resultFile,platform);
         } else if (HttpUrl.parse(pathOrUrl) != null) {
+            if(resultFile.exists()){
+                resultFile.delete();
+            }
+            resultFile.createNewFile();
             // download image
             return downloadImageToUri(pathOrUrl, resultFile);
         } else {
