@@ -42,7 +42,8 @@ dependencies {
     api 'com.umeng.umsdk:share-sina:7.1.7'//新浪微博完整版
 //    implementation(name: 'openDefault-10.10.0', ext: 'aar')
     implementation 'io.github.good-good-study:sina-weibo-sdk:10.10.1'
-    api 'com.tencent.tauth:qqopensdk:3.53.0'//QQ官方依赖库，必选
+    api fileTree(dir: 'libs', include: '*.jar')
+//    api 'com.tencent.tauth:qqopensdk:3.5.5.79'//QQ官方依赖库，必选,垃圾腾讯,估计是因为没有遵守协议,不敢放到maven上
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.3.1'//QQ SDK在3.53.0版本及以上时需要集成okhttp官方依赖库，必选
 //    api  'com.umeng.umsdk:common:9.4.4'// (必选)

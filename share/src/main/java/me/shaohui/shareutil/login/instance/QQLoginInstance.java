@@ -2,6 +2,7 @@ package me.shaohui.shareutil.login.instance;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -142,44 +143,29 @@ public class QQLoginInstance extends LoginInstance {
         mTencent.login(activity, SCOPE, mIUiListener);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
-        Flowable.create(new FlowableOnSubscribe<QQUser>() {
-            @Override
-            public void subscribe(FlowableEmitter<QQUser> qqUserEmitter) throws Exception {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().url(buildUserInfoUrl(token, URL)).build();
+        Flowable.create((FlowableOnSubscribe<QQUser>) qqUserEmitter -> {
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(buildUserInfoUrl(token, URL)).build();
 
-                try {
-                    Response response = client.newCall(request).execute();
-                    JSONObject jsonObject = new JSONObject(response.body().string());
-                    QQUser user = QQUser.parse(token.getOpenid(), jsonObject);
-                    qqUserEmitter.onNext(user);
-                } catch (IOException | JSONException e) {
-                    ShareLogger.e(INFO.FETCH_USER_INOF_ERROR);
-                    qqUserEmitter.onError(e);
-                }
+            try {
+                Response response = client.newCall(request).execute();
+                JSONObject jsonObject = new JSONObject(response.body().string());
+                QQUser user = QQUser.parse(token.getOpenid(), jsonObject);
+                qqUserEmitter.onNext(user);
+            } catch (IOException | JSONException e) {
+                ShareLogger.e(INFO.FETCH_USER_INOF_ERROR);
+                qqUserEmitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<QQUser>() {
-                    @Override
-                    public void accept(final QQUser qqUser) throws Exception {
-                        //登陆qq完成之后获取UnionId
-                        getUnionId(mActivity, token, new Runnable() {
-                            @Override
-                            public void run() {
-                                mLoginListener.loginSuccess(new LoginResult(LoginPlatform.QQ, token, qqUser));
-                            }
-                        });
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable));
-                    }
-                });
+                .subscribe(qqUser -> {
+                    //登陆qq完成之后获取UnionId
+                    getUnionId(mActivity, token, () -> mLoginListener.loginSuccess(new LoginResult(LoginPlatform.QQ, token, qqUser)));
+                }, throwable -> mLoginListener.loginFailure(new Exception(throwable)));
     }
 
     private void initOpenidAndToken(JSONObject jsonObject) {
@@ -213,18 +199,22 @@ public class QQLoginInstance extends LoginInstance {
 
     @Override
     public boolean isInstall(Context context) {
-        PackageManager pm = context.getPackageManager();
-        if (pm == null) {
+        try {
+            return mTencent.isQQInstalled(context);
+        }catch (Exception e){
+            PackageManager pm = context.getPackageManager();
+            if (pm == null) {
+                return false;
+            }
+
+            List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
+            for (PackageInfo info : packageInfos) {
+                if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
+                    return true;
+                }
+            }
             return false;
         }
-
-        List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
-        for (PackageInfo info : packageInfos) {
-            if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

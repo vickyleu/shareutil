@@ -67,12 +67,12 @@ public class QQShareInstance implements ShareInstance {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(subscription -> listener.shareRequest())
-                .subscribe(s -> {
+                .subscribe(imageUri -> {
                     if (platform == SharePlatform.QZONE) {
-                        shareToQZoneForMedia(title, targetUrl, summary, s, activity,
+                        shareToQZoneForMedia(title, targetUrl, summary, imageUri, activity,
                                 listener);
                     } else {
-                        shareToQQForMedia(title, summary, targetUrl, s, activity, listener);
+                        shareToQQForMedia(title, summary, targetUrl, imageUri, activity, listener);
                     }
                 }, throwable -> {
                     activity.finish();
@@ -118,18 +118,22 @@ public class QQShareInstance implements ShareInstance {
 
     @Override
     public boolean isInstall(Context context) {
-        PackageManager pm = context.getPackageManager();
-        if (pm == null) {
+        try {
+            return mTencent.isQQInstalled(context);
+        }catch (Exception e){
+            PackageManager pm = context.getPackageManager();
+            if (pm == null) {
+                return false;
+            }
+
+            List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
+            for (PackageInfo info : packageInfos) {
+                if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
+                    return true;
+                }
+            }
             return false;
         }
-
-        List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
-        for (PackageInfo info : packageInfos) {
-            if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
