@@ -15,13 +15,6 @@
     </queries>
 
     <application>
-        <activity
-                android:name="com.sina.weibo.sdk.web.WebActivity"
-                android:configChanges="keyboardHidden|orientation"
-                android:exported="false"
-                tools:replace="android:configChanges"
-                android:windowSoftInputMode="adjustResize"
-                />
 
         <activity
                 android:name="com.tencent.connect.common.AssistActivity"
