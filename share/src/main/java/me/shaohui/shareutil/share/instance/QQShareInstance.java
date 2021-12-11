@@ -151,7 +151,8 @@ public class QQShareInstance implements ShareInstance {
         params.putString(QQShare.SHARE_TO_QQ_TITLE, title);
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, summary);
         params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, targetUrl);
-        params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, thumbUrl);
+        params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, thumbUrl);
+//        params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, thumbUrl);
         mTencent.shareToQQ(activity, params, listener);
     }
 
@@ -173,24 +174,26 @@ public class QQShareInstance implements ShareInstance {
     private void shareToQZoneForMedia(String title, String targetUrl, String summary,
                                       String imageUrl, Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
-        final ArrayList<String> image = new ArrayList<>();
-        image.add(imageUrl);
+//        final ArrayList<String> image = new ArrayList<>();
+//        image.add(imageUrl);
         params.putInt(QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
                 QzoneShare.SHARE_TO_QZONE_TYPE_IMAGE_TEXT);
         params.putString(QzoneShare.SHARE_TO_QQ_TITLE, title);
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, summary);
         params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, targetUrl);
-        params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
+//        params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
+        params.putString(QzoneShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, imageUrl);
         mTencent.shareToQzone(activity, params, listener);
     }
 
     private void shareToQzoneForImage(String imagePath, Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
-        final ArrayList<String> image = new ArrayList<>();
-        image.add(imagePath);
+//        final ArrayList<String> image = new ArrayList<>();
+//        image.add(imagePath);
         params.putInt(QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
                 QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD);
-        params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
+//        params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
+        params.putString(QzoneShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, imagePath);
         mTencent.publishToQzone(activity, params, listener);
     }
 }
