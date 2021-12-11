@@ -39,17 +39,17 @@ public class ImageDecoder {
 
     private static final String FILE_NAME = "/shareData/test.png";
 
-    public static String decode(Context context, ShareImageObject imageObject, int platform) throws Exception {
+    public static String decode(Context context, ShareImageObject imageObject, int platform,boolean needProvider) throws Exception {
         File resultFile = cacheFile(context);
         if (!TextUtils.isEmpty(imageObject.getPathOrUrl())) {
-            return decode(context, imageObject.getPathOrUrl(),platform);
+            return decode(context, imageObject.getPathOrUrl(),platform,needProvider);
         } else if (imageObject.getBitmap() != null) {
             // save bitmap to file
             createFile(resultFile);
             FileOutputStream outputStream = new FileOutputStream(resultFile);
             imageObject.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.close();
-            if(checkAndroidNotBelowN()){
+            if(checkAndroidNotBelowN()&&needProvider){
                 if(platform== SharePlatform.WX||platform== SharePlatform.WX_TIMELINE||platform== SharePlatform.WX_MiniProgram){///微信
                     IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
                     if(api.getWXAppSupportAPI() >= 0x27000D00){
@@ -78,7 +78,8 @@ public class ImageDecoder {
                 else{
                     return resultFile.getAbsolutePath();
                 }
-            }else{
+            }
+            else{
                 return resultFile.getAbsolutePath();
             }
         } else {
@@ -93,12 +94,12 @@ public class ImageDecoder {
         return baos.toByteArray();
     }
 
-    private static String decode(Context context, String pathOrUrl,int platform) throws Exception {
+    private static String decode(Context context, String pathOrUrl,int platform,boolean needProvider) throws Exception {
         File resultFile = cacheFile(context);
         if (new File(pathOrUrl).exists()) {
             createFile(resultFile);
             // copy file
-            return decodeFile(context,new File(pathOrUrl), resultFile,platform);
+            return decodeFile(context,new File(pathOrUrl), resultFile,platform,needProvider);
         } else if (HttpUrl.parse(pathOrUrl) != null) {
             createFile(resultFile);
             // download image
@@ -158,9 +159,9 @@ public class ImageDecoder {
         outputStream.close();
     }
 
-    private static String decodeFile(Context context, File origin, File result, int platform) throws IOException {
+    private static String decodeFile(Context context, File origin, File result, int platform,boolean needProvider) throws IOException {
         copyFile(new FileInputStream(origin), new FileOutputStream(result, false));
-        if(checkAndroidNotBelowN()){
+        if(checkAndroidNotBelowN()&&needProvider){
             if(platform== SharePlatform.WX||platform== SharePlatform.WX_TIMELINE||platform== SharePlatform.WX_MiniProgram){///微信
                 IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
                 if(api.getWXAppSupportAPI() >= 0x27000D00){

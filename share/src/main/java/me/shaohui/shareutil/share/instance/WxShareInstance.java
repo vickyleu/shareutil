@@ -68,48 +68,35 @@ public class WxShareInstance implements ShareInstance {
         sendMessage(platform, message, buildTransaction("text"));
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareMedia(
             final int platform, final String title, final String targetUrl, final String summary,
             final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<byte[]>() {
-            @Override
-            public void subscribe(FlowableEmitter<byte[]> emitter) throws Exception {
-                try {
-                    String imagePath = ImageDecoder.decode(activity, shareImageObject, platform);
-                    emitter.onNext(ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE));
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+        Flowable.create((FlowableOnSubscribe<byte[]>) emitter -> {
+            try {
+                String imagePath = ImageDecoder.decode(activity, shareImageObject, platform,false);
+                emitter.onNext(ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE));
+            } catch (Exception e) {
+                emitter.onError(e);
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Consumer<Subscription>() {
-                    @Override
-                    public void accept(Subscription subscription) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
-                .subscribe(new Consumer<byte[]>() {
-                    @Override
-                    public void accept(byte[] bytes) throws Exception {
-                        WXWebpageObject webpageObject = new WXWebpageObject();
-                        webpageObject.webpageUrl = targetUrl;
+                .doOnSubscribe(subscription -> listener.shareRequest())
+                .subscribe(bytes -> {
+                    WXWebpageObject webpageObject = new WXWebpageObject();
+                    webpageObject.webpageUrl = targetUrl;
 
-                        WXMediaMessage message = new WXMediaMessage(webpageObject);
-                        message.title = title;
-                        message.description = summary;
-                        message.thumbData = bytes;
+                    WXMediaMessage message = new WXMediaMessage(webpageObject);
+                    message.title = title;
+                    message.description = summary;
+                    message.thumbData = bytes;
 
-                        sendMessage(platform, message, buildTransaction("webPage"));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        activity.finish();
-                        listener.shareFailure(new Exception(throwable));
-                    }
+                    sendMessage(platform, message, buildTransaction("webPage"));
+                }, throwable -> {
+                    activity.finish();
+                    listener.shareFailure(new Exception(throwable));
                 });
     }
 
@@ -119,7 +106,7 @@ public class WxShareInstance implements ShareInstance {
                            final Activity activity, final ShareListener listener) {
         Flowable.create((FlowableOnSubscribe<Pair<Bitmap, byte[]>>) emitter -> {
             try {
-                String imagePath = ImageDecoder.decode(activity, shareImageObject, platform);
+                String imagePath = ImageDecoder.decode(activity, shareImageObject, platform,false);
                 emitter.onNext(Pair.create(BitmapFactory.decodeFile(imagePath),
                         ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE)));
             } catch (Exception e) {

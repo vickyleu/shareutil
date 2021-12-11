@@ -56,7 +56,7 @@ public class DefaultShareInstance implements ShareInstance {
             final Activity activity, final ShareListener listener) {
         Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
             try {
-                Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject,platform)));
+                Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject,platform,true)));
                 emitter.onNext(uri);
             } catch (Exception e) {
                 emitter.onError(e);

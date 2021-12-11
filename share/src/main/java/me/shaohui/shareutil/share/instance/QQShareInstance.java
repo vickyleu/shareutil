@@ -59,7 +59,7 @@ public class QQShareInstance implements ShareInstance {
                            final ShareListener listener) {
         Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             try {
-                emitter.onNext(ImageDecoder.decode(activity, shareImageObject, platform));
+                emitter.onNext(ImageDecoder.decode(activity, shareImageObject, platform,true));
             } catch (Exception e) {
                 emitter.onError(e);
             }
@@ -86,7 +86,7 @@ public class QQShareInstance implements ShareInstance {
                            final Activity activity, final ShareListener listener) {
         Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             try {
-                emitter.onNext(ImageDecoder.decode(activity, shareImageObject, platform));
+                emitter.onNext(ImageDecoder.decode(activity, shareImageObject, platform,true));
             } catch (Exception e) {
                 emitter.onError(e);
             }
