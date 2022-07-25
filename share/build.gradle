@@ -6,12 +6,12 @@ group = 'com.github.vickyleu'
 version = '1.0.0'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 30
     ndkVersion  "21.1.6352462"
     defaultConfig {
         minSdkVersion 16
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 33
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0.0"
         manifestPlaceholders = [
